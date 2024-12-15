@@ -335,35 +335,36 @@ measurementId: "G-4FCT9H9836"
             .catch((error) => {
                 console.error("Error signing in:", error.code, error.message);
             });
+    });// Typing functionality
+let typingTimeout;
+const typingIndicator = document.getElementById("typingIndicator");
+
+document.getElementById("messageInput").addEventListener("input", () => {
+    clearTimeout(typingTimeout);
+    const typingRef = ref(database, 'typing/' + currentUser);
+    set(typingRef, true);
+
+    // Hide typing indicator after 3 seconds of inactivity
+    typingTimeout = setTimeout(() => {
+        set(typingRef, false);
+    }, 3000);
+});
+
+// Check if the other user is typing
+const typingRef = ref(database, 'typing/');
+onValue(typingRef, (snapshot) => {
+    let isTyping = false;
+    snapshot.forEach(childSnapshot => {
+        // Check if another user is typing (not the current user)
+        if (childSnapshot.val() === true && childSnapshot.key !== currentUser) {
+            isTyping = true;
+        }
     });
 
-    // Typing functionality
-    let typingTimeout;
-    const typingIndicator = document.getElementById("typingIndicator");
+    // Show/hide typing indicator based on the typing state of the other user
+    typingIndicator.style.display = isTyping ? 'block' : 'none';
+});
 
-    document.getElementById("messageInput").addEventListener("input", () => {
-        clearTimeout(typingTimeout);
-        const typingRef = ref(database, 'typing/' + currentUser);
-        set(typingRef, true);
-
-        // Hide typing indicator after 3 seconds of inactivity
-        typingTimeout = setTimeout(() => {
-            set(typingRef, false);
-        }, 3000);
-    });
-
-    // Check if the other user is typing
-    const typingRef = ref(database, 'typing/');
-    onValue(typingRef, (snapshot) => {
-        let isTyping = false;
-        snapshot.forEach(childSnapshot => {
-            if (childSnapshot.val() === true && childSnapshot.key !== currentUser) {
-                isTyping = true;
-            }
-        });
-
-        typingIndicator.style.display = isTyping ? 'block' : 'none';
-    });
 
     // Send message functionality
     document.getElementById("sendButton").addEventListener("click", () => {
