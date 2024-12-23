@@ -230,20 +230,20 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0//firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBSRzThLp0EFb3LIk9RCOf3FsaPowUfLX8",
-        authDomain: "projecturmagic.firebaseapp.com",
-        databaseURL: "https://projecturmagic-default-rtdb.firebaseio.com",
-        projectId: "projecturmagic",
-        storageBucket: "projecturmagic.firebasestorage.app",
-        messagingSenderId: "981496673414",
-        appId: "1:981496673414:web:d75abe2e5aff73c397cd07",
-        measurementId: "G-JF63BJBP4W"
-    };
+const firebaseConfig = {
+apiKey: "AIzaSyCW0lMTQb5niDtTjZHDe9rUgBIhax4GV90",
+authDomain: "webapp-767b9.firebaseapp.com",
+databaseURL: "https://webapp-767b9-default-rtdb.firebaseio.com/",
+projectId: "webapp-767b9",
+storageBucket: "projecturmagic.firebasestorage.app",
+messagingSenderId: "752045256987",
+appId: "1:752045256987:web:e458753691f86cbc2a63be",
+measurementId: "G-4FCT9H9836"
+};
 
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
@@ -335,35 +335,36 @@
             .catch((error) => {
                 console.error("Error signing in:", error.code, error.message);
             });
+    });// Typing functionality
+let typingTimeout;
+const typingIndicator = document.getElementById("typingIndicator");
+
+document.getElementById("messageInput").addEventListener("input", () => {
+    clearTimeout(typingTimeout);
+    const typingRef = ref(database, 'typing/' + currentUser);
+    set(typingRef, true);
+
+    // Hide typing indicator after 3 seconds of inactivity
+    typingTimeout = setTimeout(() => {
+        set(typingRef, false);
+    }, 3000);
+});
+
+// Check if the other user is typing
+const typingRef = ref(database, 'typing/');
+onValue(typingRef, (snapshot) => {
+    let isTyping = false;
+    snapshot.forEach(childSnapshot => {
+        // Check if another user is typing (not the current user)
+        if (childSnapshot.val() === true && childSnapshot.key !== currentUser) {
+            isTyping = true;
+        }
     });
 
-    // Typing functionality
-    let typingTimeout;
-    const typingIndicator = document.getElementById("typingIndicator");
+    // Show/hide typing indicator based on the typing state of the other user
+    typingIndicator.style.display = isTyping ? 'block' : 'none';
+});
 
-    document.getElementById("messageInput").addEventListener("input", () => {
-        clearTimeout(typingTimeout);
-        const typingRef = ref(database, 'typing/' + currentUser);
-        set(typingRef, true);
-
-        // Hide typing indicator after 3 seconds of inactivity
-        typingTimeout = setTimeout(() => {
-            set(typingRef, false);
-        }, 3000);
-    });
-
-    // Check if the other user is typing
-    const typingRef = ref(database, 'typing/');
-    onValue(typingRef, (snapshot) => {
-        let isTyping = false;
-        snapshot.forEach(childSnapshot => {
-            if (childSnapshot.val() === true && childSnapshot.key !== currentUser) {
-                isTyping = true;
-            }
-        });
-
-        typingIndicator.style.display = isTyping ? 'block' : 'none';
-    });
 
     // Send message functionality
     document.getElementById("sendButton").addEventListener("click", () => {
