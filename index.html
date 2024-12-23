@@ -230,20 +230,20 @@
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0//firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-const firebaseConfig = {
-apiKey: "AIzaSyCW0lMTQb5niDtTjZHDe9rUgBIhax4GV90",
-authDomain: "webapp-767b9.firebaseapp.com",
-databaseURL: "https://webapp-767b9-default-rtdb.firebaseio.com/",
-projectId: "webapp-767b9",
-storageBucket: "projecturmagic.firebasestorage.app",
-messagingSenderId: "752045256987",
-appId: "1:752045256987:web:e458753691f86cbc2a63be",
-measurementId: "G-4FCT9H9836"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyBSRzThLp0EFb3LIk9RCOf3FsaPowUfLX8",
+        authDomain: "projecturmagic.firebaseapp.com",
+        databaseURL: "https://projecturmagic-default-rtdb.firebaseio.com",
+        projectId: "projecturmagic",
+        storageBucket: "projecturmagic.firebasestorage.app",
+        messagingSenderId: "981496673414",
+        appId: "1:981496673414:web:d75abe2e5aff73c397cd07",
+        measurementId: "G-JF63BJBP4W"
+    };
 
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
@@ -326,7 +326,7 @@ measurementId: "G-4FCT9H9836"
         onValue(otherUserRef, (snapshot) => {
             const otherUserData = snapshot.val();
             const lastSeen = otherUserData ? otherUserData.lastSeen : "Unknown";
-            document.getElementById("lastSeenBanner").innerHTML = User ${otherUser} was last seen at ${lastSeen};
+            document.getElementById("lastSeenBanner").innerHTML = `User ${otherUser} was last seen at ${lastSeen}`;
             document.getElementById("lastSeenBanner").style.display = "block";
         });
 
@@ -335,36 +335,35 @@ measurementId: "G-4FCT9H9836"
             .catch((error) => {
                 console.error("Error signing in:", error.code, error.message);
             });
-    });// Typing functionality
-let typingTimeout;
-const typingIndicator = document.getElementById("typingIndicator");
-
-document.getElementById("messageInput").addEventListener("input", () => {
-    clearTimeout(typingTimeout);
-    const typingRef = ref(database, 'typing/' + currentUser);
-    set(typingRef, true);
-
-    // Hide typing indicator after 3 seconds of inactivity
-    typingTimeout = setTimeout(() => {
-        set(typingRef, false);
-    }, 3000);
-});
-
-// Check if the other user is typing
-const typingRef = ref(database, 'typing/');
-onValue(typingRef, (snapshot) => {
-    let isTyping = false;
-    snapshot.forEach(childSnapshot => {
-        // Check if another user is typing (not the current user)
-        if (childSnapshot.val() === true && childSnapshot.key !== currentUser) {
-            isTyping = true;
-        }
     });
 
-    // Show/hide typing indicator based on the typing state of the other user
-    typingIndicator.style.display = isTyping ? 'block' : 'none';
-});
+    // Typing functionality
+    let typingTimeout;
+    const typingIndicator = document.getElementById("typingIndicator");
 
+    document.getElementById("messageInput").addEventListener("input", () => {
+        clearTimeout(typingTimeout);
+        const typingRef = ref(database, 'typing/' + currentUser);
+        set(typingRef, true);
+
+        // Hide typing indicator after 3 seconds of inactivity
+        typingTimeout = setTimeout(() => {
+            set(typingRef, false);
+        }, 3000);
+    });
+
+    // Check if the other user is typing
+    const typingRef = ref(database, 'typing/');
+    onValue(typingRef, (snapshot) => {
+        let isTyping = false;
+        snapshot.forEach(childSnapshot => {
+            if (childSnapshot.val() === true && childSnapshot.key !== currentUser) {
+                isTyping = true;
+            }
+        });
+
+        typingIndicator.style.display = isTyping ? 'block' : 'none';
+    });
 
     // Send message functionality
     document.getElementById("sendButton").addEventListener("click", () => {
@@ -400,14 +399,14 @@ onValue(typingRef, (snapshot) => {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', messageData.sender === currentUser ? 'me' : 'friend');
 
-                messageElement.innerHTML = 
+                messageElement.innerHTML = `
                     <div class="avatar" style="background-image: url('${messageData.sender === "21" ? "https://i.ibb.co/0s9nJzh/product-jpeg.jpg" : "https://i.ibb.co/kmkZjsW/Untitled-design-3.png"}');"></div>
                     <div class="message-text">
                         <div class="name">${messageData.sender}</div>
                         <div class="time">${messageData.time}</div>
                         <div class="text">${messageData.text}</div>
                     </div>
-                ;
+                `;
                 chatBox.appendChild(messageElement);
             });
         });
@@ -420,4 +419,4 @@ onValue(typingRef, (snapshot) => {
 </script>
 
 </body>
-</html> 
+</html>
